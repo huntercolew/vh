@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="V and H monogram">
+  <defs>
+    <radialGradient id="paper" cx="50%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="#fffefa"/>
+      <stop offset="72%" stop-color="#f8f7f3"/>
+      <stop offset="100%" stop-color="#efe9de"/>
+    </radialGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#201e18" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#f8f7f3"/>
+  <circle cx="256" cy="256" r="214" fill="url(#paper)" stroke="#587754" stroke-width="14" filter="url(#shadow)"/>
+  <circle cx="256" cy="256" r="176" fill="none" stroke="#587754" stroke-width="4" stroke-opacity="0.26"/>
+  <text x="256" y="292" text-anchor="middle"
+        font-family="Didot, 'Bodoni 72', Georgia, serif"
+        font-size="132" font-weight="400" letter-spacing="-8"
+        fill="#405f3d">V&amp;H</text>
+</svg>

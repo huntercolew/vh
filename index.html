@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f8f7f3" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <title>Victoria & Hunter Wedding Invitation</title>
+  <style>
+    :root {
+      --paper: #f8f7f3;
+      --paper-warm: #efede5;
+      --envelope: #fffdf8;
+      --envelope-shadow: #e7e1d4;
+      --crease: rgba(116, 109, 94, .22);
+      --green: #587754;
+      --green-deep: #405f3d;
+      --ink: #181714;
+      --muted: #67645d;
+      --white: #fffefa;
+      --serif: Didot, "Bodoni 72", "Bodoni 72 Smallcaps", Georgia, "Times New Roman", serif;
+      --script: "Snell Roundhand", "Apple Chancery", "Bickham Script Pro", "Brush Script MT", cursive;
+      --sans: "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif;
+      --ease-out: cubic-bezier(.18, .82, .22, 1);
+      --ease-fold: cubic-bezier(.67, 0, .2, 1);
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      min-height: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+    body {
+      margin: 0;
+      width: 100%;
+      color: var(--ink);
+      font-family: var(--sans);
+      background:
+        linear-gradient(90deg, rgba(88,119,84,.045) 1px, transparent 1px),
+        linear-gradient(rgba(88,119,84,.035) 1px, transparent 1px),
+        radial-gradient(circle at 50% 14%, #fff 0, var(--paper) 48%, var(--paper-warm) 100%);
+      background-size: 34px 34px, 34px 34px, auto;
+      overflow-x: hidden;
+    }
+
+    .page {
+      min-height: 100svh;
+      display: grid;
+      place-items: start center;
+      padding: clamp(52px, 7vw, 86px) 16px 18px;
+      max-width: 100vw;
+      overflow-x: clip;
+      justify-items: center;
+    }
+
+    .invitation {
+      width: min(100%, 1180px);
+      max-width: 100%;
+      text-align: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--green);
+      font: 700 11px/1 var(--sans);
+      letter-spacing: .28em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0 auto;
+      max-width: 800px;
+      font: 400 clamp(34px, 6vw, 76px)/.92 var(--serif);
+      letter-spacing: -.035em;
+      text-wrap: balance;
+    }
+
+    .script {
+      display: block;
+      color: var(--green);
+      font-family: var(--script);
+      font-size: 1.12em;
+      letter-spacing: normal;
+      transform: translateY(.08em);
+    }
+
+    .intro {
+      margin: 10px auto 0;
+      max-width: 560px;
+      color: var(--muted);
+      font: 18px/1.55 var(--serif);
+      text-wrap: pretty;
+      transition: opacity 280ms ease, transform 280ms ease;
+    }
+
+    .stage {
+      position: relative;
+      min-height: clamp(260px, 34vw, 350px);
+      display: grid;
+      place-items: end center;
+      margin: clamp(24px, 3vw, 36px) auto 0;
+      perspective: 1400px;
+      transition: min-height 520ms var(--ease-out), margin 520ms var(--ease-out);
+    }
+
+    .envelope {
+      position: relative;
+      width: min(82vw, 540px);
+      aspect-ratio: 1.56 / 1;
+      border: 0;
+      padding: 0;
+      appearance: none;
+      -webkit-appearance: none;
+      background: transparent;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      filter: drop-shadow(0 24px 28px rgba(32, 30, 24, .14));
+      transition: transform .25s ease, filter .25s ease;
+    }
+    .envelope:hover { transform: translateY(-2px); filter: drop-shadow(0 30px 32px rgba(32, 30, 24, .18)); }
+    .envelope:focus-visible { outline: 3px solid rgba(88,119,84,.42); outline-offset: 12px; border-radius: 10px; }
+
+    .envelope-bg,
+    .insert-liner,
+    .front-triangle,
+    .top-flap {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+    }
+
+    /* Slightly darker envelope background, always present. */
+    .envelope-bg {
+      z-index: 1;
+      background: #f0ebe2;
+      box-shadow: inset 0 0 0 1px rgba(116,109,94,.14);
+    }
+
+    /* Placeholder insert/liner. Hidden while closed, fully visible after top flap collapses. */
+    .insert-liner {
+      z-index: 2;
+      inset: 0 18px auto;
+      width: auto;
+      height: 140%;
+      border-radius: 14px 14px 8px 8px;
+      background:
+        linear-gradient(rgba(255,255,255,.18), rgba(255,255,255,.18)),
+        url("assets/envelope-liner-placeholder.webp") center 52% / cover no-repeat;
+      opacity: 0;
+      transform: translateY(0);
+      clip-path: polygon(48.6% 0, 51.4% 0, 100% 31%, 100% 100%, 0 100%, 0 31%);
+      transition: opacity 180ms ease, transform 1400ms linear;
+    }
+
+    /* Front face is deliberately three triangles, matching the envelope reference geometry. */
+    .front-triangle {
+      z-index: 4;
+      background: linear-gradient(180deg, #fffefa 0%, #f3eee4 100%);
+      box-shadow: inset 0 0 0 1px rgba(116,109,94,.06);
+    }
+    .front-triangle--left {
+      clip-path: polygon(0 0, 50% 60%, 0 100%);
+    }
+    .front-triangle--right {
+      clip-path: polygon(100% 0, 50% 60%, 100% 100%);
+    }
+    .front-triangle--bottom {
+      z-index: 5;
+      clip-path: polygon(0 100%, 50% 60%, 100% 100%);
+      background: linear-gradient(180deg, #fffdf8 0%, #eee7db 100%);
+    }
+
+    /* The top flap always sits above every other envelope element. */
+    .top-flap {
+      z-index: 10;
+      top: 0;
+      height: 100%;
+      transform-origin: 50% 0;
+      transform: scaleY(1);
+      clip-path: polygon(0 0, 100% 0, 100% 12%, 51.4% 60%, 48.6% 60%, 0 12%);
+      background: linear-gradient(180deg, #fffdf7 0%, #eee8dc 100%);
+      box-shadow: inset 0 -1px 0 rgba(116,109,94,.2);
+      filter: drop-shadow(0 4px 3px rgba(116,109,94,.14));
+      border-radius: 8px 8px 14px 14px;
+      transition: transform 720ms var(--ease-fold), filter 240ms ease;
+    }
+
+    .flap-print {
+      position: absolute;
+      top: 18%;
+      left: 50%;
+      width: 82%;
+      transform: translateX(-50%);
+      color: rgba(24, 23, 20, .82);
+      text-align: center;
+      pointer-events: none;
+      transition: opacity 220ms ease;
+    }
+    .flap-print__type {
+      display: block;
+      font: 700 clamp(8px, 1.25vw, 11px)/1.1 var(--sans);
+      letter-spacing: .14em;
+    }
+    .flap-print__script {
+      display: block;
+      margin-top: 6px;
+      font: 400 clamp(19px, 3.4vw, 30px)/.9 var(--script);
+      letter-spacing: normal;
+    }
+    .flap-print__script--small {
+      font-size: clamp(16px, 2.8vw, 24px);
+    }
+    .flap-print__script--surname {
+      margin-top: 2px;
+    }
+
+    .prompt {
+      min-height: 18px;
+      margin: 18px 0 0;
+      color: var(--green-deep);
+      font: 700 11px/1 var(--sans);
+      letter-spacing: .24em;
+      text-transform: uppercase;
+      transition: opacity 240ms ease, transform 240ms ease;
+    }
+
+    .contents {
+      max-width: 1120px;
+      max-height: 0;
+      margin: 0 auto;
+      opacity: 0;
+      transform: translateY(-32px);
+      overflow: hidden;
+      pointer-events: none;
+      transition:
+        max-height 1ms linear 900ms,
+        margin 1ms linear 900ms,
+        opacity 600ms ease 900ms,
+        transform 760ms var(--ease-out) 900ms;
+    }
+
+    .contents h2 {
+      margin: 0 0 8px;
+      color: var(--green-deep);
+      font: 400 clamp(28px, 4vw, 38px)/1.04 var(--serif);
+    }
+    .contents > p {
+      max-width: 620px;
+      margin: 0 auto 20px;
+      color: var(--muted);
+      font: 16px/1.58 var(--serif);
+    }
+
+    .scroll-cue {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 auto 10px;
+      color: var(--green-deep);
+      font: 700 11px/1 var(--sans);
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      opacity: .78;
+    }
+    .scroll-cue__arrow {
+      display: inline-block;
+      font-size: 16px;
+      line-height: 1;
+      transform: translateY(-1px);
+    }
+
+    .card-carousel {
+      display: flex;
+      gap: clamp(16px, 2.4vw, 28px);
+      align-items: stretch;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding: 8px max(14px, calc((100vw - 1120px) / 2 + 14px)) 24px;
+      margin-inline: calc(50% - 50vw);
+      scrollbar-color: rgba(88,119,84,.45) transparent;
+    }
+
+    .invite-card {
+      flex: 0 0 auto;
+      scroll-snap-align: center;
+      display: grid;
+      place-items: center;
+      min-height: 1px;
+      padding: 10px;
+      background: var(--white);
+      border: 1px solid rgba(116,109,94,.16);
+      border-radius: 6px;
+      box-shadow: 0 18px 38px rgba(32, 30, 24, .14);
+    }
+    .invite-card--portrait { width: min(82vw, 430px); }
+    .invite-card--landscape { width: min(86vw, 560px); }
+    .invite-card img {
+      width: 100%;
+      height: auto;
+      max-height: min(74vh, 760px);
+      object-fit: contain;
+      display: block;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .details-link {
+      display: inline-flex;
+      margin-top: 28px;
+      margin-bottom: 24px;
+      min-height: 58px;
+      align-items: center;
+      justify-content: center;
+      padding: 0 32px;
+      color: var(--white);
+      background: var(--green);
+      border: 1px solid var(--green);
+      border-radius: 999px;
+      font: 700 12px/1 var(--sans);
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: transform .2s ease, background .2s ease;
+    }
+    .details-link:hover, .details-link:focus-visible { transform: translateY(-2px); background: var(--green-deep); }
+    .details-link:focus-visible { outline: 3px solid rgba(88,119,84,.35); outline-offset: 4px; }
+
+    .fine-print {
+      margin: 18px 0 0;
+      color: rgba(24,23,20,.48);
+      font: 700 10px/1.5 var(--sans);
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .invitation.is-open .top-flap {
+      z-index: 2;
+      transform: scaleY(-1);
+      filter: brightness(.98) drop-shadow(0 -3px 3px rgba(116,109,94,.13));
+    }
+    .invitation.is-open .flap-print { opacity: 0; }
+    .invitation.is-open .insert-liner {
+      z-index: 3;
+      opacity: 1;
+      transform: translateY(-40%);
+      transition: opacity 360ms ease 520ms, transform 760ms var(--ease-out) 360ms;
+    }
+    .invitation.is-open .stage {
+      min-height: clamp(330px, 42vw, 440px);
+      margin: clamp(124px, 11vw, 164px) auto 0;
+    }
+    .invitation.is-closing .top-flap { transition-delay: 1400ms; }
+    .invitation.is-open .intro { opacity: 0; transform: translateY(-4px); }
+    .invitation.is-open .prompt { opacity: 0; transform: translateY(-4px); }
+    .invitation.is-open .contents {
+      max-height: 1800px;
+      margin: clamp(18px, 3vw, 34px) auto 0;
+      opacity: 1;
+      transform: translateY(0);
+      overflow: hidden;
+      pointer-events: auto;
+    }
+
+    @media (max-width: 760px) {
+      body {
+        background-color: var(--paper);
+        background-image:
+          linear-gradient(90deg, rgba(88,119,84,.045) 1px, transparent 1px),
+          linear-gradient(rgba(88,119,84,.035) 1px, transparent 1px);
+        background-size: 34px 34px, 34px 34px;
+      }
+      h1 {
+        max-width: min(86vw, 620px);
+        font-size: clamp(32px, 10.5vw, 58px);
+      }
+      .contents h2 { font-size: clamp(26px, 8vw, 34px); }
+      .contents > p {
+        max-width: 82vw;
+        font-size: 15px;
+      }
+      .scroll-cue { margin-bottom: 12px; }
+      .invitation { width: 100vw; max-width: 100vw; }
+      .stage { width: 100vw; min-height: 300px; margin: 56px auto 0; place-items: end center; }
+      .invitation.is-open .stage { min-height: 380px; margin-top: 104px; }
+      .envelope { width: min(84vw, 500px); max-width: 84vw; margin-inline: auto; }
+      .contents { width: 100vw; max-width: 100vw; margin-top: 10px; }
+      .card-carousel {
+        width: 100vw;
+        margin-inline: 0;
+        padding-inline: 13vw;
+        scroll-padding-inline: 13vw;
+      }
+      .invite-card--portrait { width: min(72vw, 310px); }
+      .invite-card--landscape { width: min(78vw, 380px); }
+    }
+
+    @media (max-width: 480px) {
+      .page { padding: 48px 0 54px; }
+      .invitation { width: 100vw; max-width: 100vw; }
+      .contents {
+        width: 100vw;
+        max-width: 100vw;
+      }
+      h1 {
+        max-width: 86vw;
+        font-size: clamp(30px, 10.8vw, 46px);
+      }
+      .eyebrow { font-size: 10px; letter-spacing: .22em; }
+      .contents h2 { font-size: clamp(24px, 7.8vw, 31px); }
+      .contents > p {
+        max-width: 82vw;
+        font-size: 14px;
+      }
+      .scroll-cue {
+        font-size: 10px;
+        letter-spacing: .16em;
+        margin-bottom: 12px;
+      }
+      .intro { font-size: 16px; }
+      .stage { width: 100vw; min-height: 310px; margin: 40px auto 0; }
+      .invitation.is-open .stage { min-height: 360px; margin-top: 92px; }
+      .envelope { width: 84vw; max-width: 84vw; }
+      .flap-print { top: 17%; width: 84%; }
+      .flap-print__type { font-size: clamp(7px, 2.35vw, 10px); }
+      .flap-print__script { font-size: clamp(18px, 6.5vw, 27px); }
+      .flap-print__script--small { font-size: clamp(15px, 5.5vw, 22px); }
+      .card-carousel {
+        width: 100vw;
+        padding-inline: 14vw;
+        scroll-padding-inline: 14vw;
+      }
+      .invite-card { padding: 7px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="invitation" id="invitation" aria-labelledby="page-title">
+      <p class="eyebrow">A wedding invitation for you</p>
+      <h1 id="page-title"><span class="script">Victoria &amp; Hunter</span> saved a seat for you.</h1>
+      <div class="stage" aria-label="Animated white envelope with placeholder liner">
+        <button class="envelope" id="envelope" type="button" aria-label="Open Victoria and Hunter's wedding invitation" aria-expanded="false" onclick="toggleInvitation()">
+          <div class="envelope-bg" aria-hidden="true"></div>
+          <div class="insert-liner" aria-hidden="true"></div>
+          <div class="front-triangle front-triangle--left" aria-hidden="true"></div>
+          <div class="front-triangle front-triangle--right" aria-hidden="true"></div>
+          <div class="front-triangle front-triangle--bottom" aria-hidden="true"></div>
+          <div class="top-flap" aria-hidden="true">
+            <span class="flap-print">
+              <span class="flap-print__type">From the future</span>
+              <span class="flap-print__script flap-print__script--small">Mr. and Mrs.</span>
+              <span class="flap-print__script flap-print__script--surname">Williams</span>
+            </span>
+          </div>
+        </button>
+      </div>
+      <p class="prompt" id="prompt">Click the envelope to open</p>
+
+      <div class="contents" id="contents" aria-live="polite">
+        <h2>Your invitation suite</h2>
+        <p>Swipe sideways to read each card. Visit the wedding website for RSVP, travel, registry, and celebration details.</p>
+        <div class="scroll-cue" aria-hidden="true">Scroll <span class="scroll-cue__arrow">→</span></div>
+        <div class="card-carousel" aria-label="Swipeable invitation cards">
+          <article class="invite-card invite-card--portrait"><img src="assets/invitation.png" alt="Wedding invitation for Victoria Claire Meaux and Hunter Cole Williams" /></article>
+          <article class="invite-card invite-card--portrait"><img src="assets/details.png" alt="Wedding details, reception, accommodations, and additional information" /></article>
+          <article class="invite-card invite-card--landscape"><img src="assets/rsvp.png" alt="RSVP card asking guests to reply by September 8 via the wedding website" /></article>
+        </div>
+        <a class="details-link" href="https://victoriaandhunter.com" target="_blank" rel="noreferrer">Visit the wedding website ↗</a>
+        <p class="fine-print">Kindly reply by September 8 · Semi-formal reception to follow</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const invitation = document.getElementById('invitation');
+    const envelope = document.getElementById('envelope');
+    const prompt = document.getElementById('prompt');
+
+    let closingTimer;
+
+    function setInvitationOpen(isOpen) {
+      clearTimeout(closingTimer);
+      invitation.classList.remove('is-closing');
+
+      if (isOpen) {
+        invitation.classList.add('is-open');
+      } else {
+        invitation.classList.add('is-closing');
+        invitation.classList.remove('is-open');
+        closingTimer = setTimeout(() => invitation.classList.remove('is-closing'), 920);
+      }
+
+      envelope.setAttribute('aria-expanded', String(isOpen));
+      envelope.setAttribute('aria-label', isOpen ? "Close Victoria and Hunter's wedding invitation" : "Open Victoria and Hunter's wedding invitation");
+    }
+
+    function toggleInvitation() {
+      if (invitation.classList.contains('is-open')) return;
+      setInvitationOpen(true);
+      envelope.disabled = true;
+    }
+  </script>
+</body>
+</html>
