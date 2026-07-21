@@ -139,6 +139,56 @@
     .envelope:hover { transform: translateY(-2px); filter: drop-shadow(0 30px 32px rgba(32, 30, 24, .18)); }
     .envelope:focus-visible { outline: 3px solid rgba(88,119,84,.42); outline-offset: 12px; border-radius: 10px; }
 
+    .retriever {
+      position: absolute;
+      z-index: 12;
+      left: max(1vw, calc(50% - min(42vw, 250px) - 160px));
+      bottom: 3%;
+      width: 160px;
+      height: 102px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-150%) scale(.92);
+      transform-origin: 50% 100%;
+      filter: drop-shadow(0 7px 5px rgba(32, 30, 24, .16));
+    }
+    .retriever__sprite {
+      display: block;
+      width: 160px;
+      height: 102px;
+      background: url("assets/goldenspritesheet.png") 0 0 / 2400px 102px no-repeat;
+    }
+
+    .invitation.is-dog-sequence .retriever {
+      opacity: 1;
+      animation: retriever-run 900ms linear forwards;
+    }
+    .invitation.is-dog-sequence .retriever__sprite {
+      animation: retriever-sprite-run 800ms steps(8, end) forwards;
+    }
+    .invitation.is-dog-lick .retriever__sprite {
+      animation: retriever-sprite-finish 672ms steps(6, end) forwards;
+    }
+    .invitation.is-open .retriever {
+      opacity: 0;
+      transition: opacity 120ms ease-out;
+    }
+
+    @keyframes retriever-run {
+      0% { transform: translateX(-150%) scale(.92); }
+      72% { transform: translateX(0) scale(1); }
+      86% { transform: translateX(4px) scale(1); }
+      100% { transform: translateX(0) scale(1); }
+    }
+    @keyframes retriever-sprite-run {
+      from { background-position-x: 0; }
+      to { background-position-x: -1280px; }
+    }
+    @keyframes retriever-sprite-finish {
+      from { background-position-x: -1280px; }
+      to { background-position-x: -2240px; }
+    }
+
     .envelope-bg,
     .insert-liner,
     .front-triangle,
@@ -467,6 +517,9 @@
       <h1 id="page-title"><span class="script">Victoria &amp; Hunter</span> saved a seat for you.</h1>
       <p class="event-date">October 17th, 2026</p>
       <div class="stage" aria-label="Animated white envelope with placeholder liner">
+        <div class="retriever" role="img" aria-label="A golden retriever runs to the envelope and licks it">
+          <span class="retriever__sprite" aria-hidden="true"></span>
+        </div>
         <button class="envelope" id="envelope" type="button" aria-label="Open Victoria and Hunter's wedding invitation" aria-expanded="false" onclick="toggleInvitation()">
           <div class="envelope-bg" aria-hidden="true"></div>
           <div class="insert-liner" aria-hidden="true"></div>
@@ -505,6 +558,7 @@
     const prompt = document.getElementById('prompt');
 
     let closingTimer;
+    let dogSequenceTimer;
 
     function setInvitationOpen(isOpen) {
       clearTimeout(closingTimer);
@@ -523,9 +577,17 @@
     }
 
     function toggleInvitation() {
-      if (invitation.classList.contains('is-open')) return;
-      setInvitationOpen(true);
+      if (invitation.classList.contains('is-open') || invitation.classList.contains('is-dog-sequence')) return;
+
+      invitation.classList.add('is-dog-sequence');
       envelope.disabled = true;
+      dogSequenceTimer = setTimeout(() => {
+        invitation.classList.add('is-dog-lick');
+        dogSequenceTimer = setTimeout(() => {
+          invitation.classList.remove('is-dog-sequence', 'is-dog-lick');
+          setInvitationOpen(true);
+        }, 840);
+      }, 900);
     }
   </script>
 </body>
